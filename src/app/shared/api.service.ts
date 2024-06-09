@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {ITokenResponse} from "./models";
-import * as querystring from "node:querystring";
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +13,7 @@ export class ApiService {
   }
 
   authenticateUser(codeChallenge: any, codeVerifier: any) {
-    const clientId = '77c7ef8fb2314287b759231806891001';
+    const clientId = '';
     const redirectUri = 'http://localhost:4200/callback';
     const scope = 'user-read-private user-read-email';
     const authUrl = new URL("https://accounts.spotify.com/authorize")
@@ -44,8 +43,8 @@ export class ApiService {
   }
 
   requestAccessToken(code: any):Observable<ITokenResponse> {
-    const clientId = '77c7ef8fb2314287b759231806891001';
-    let codeVerifier = localStorage.getItem('code_verifier');
+    const clientId = '';
+    let codeVerifier: string | null = localStorage.getItem('code_verifier') as string;
     const redirectUri = 'http://localhost:4200/callback';
     let params = new HttpParams()
 
@@ -53,21 +52,19 @@ export class ApiService {
       'Content-Type': 'application/x-www-form-urlencoded',
     }
     );
-    let options = { headers: headers };
 
     const paramsObject =  {
       client_id: clientId,
       grant_type: 'authorization_code',
-      code,
+      code : code,
       redirect_uri: redirectUri,
       code_verifier: codeVerifier,
     }
 
-    for (const [key, value] of Object.entries(paramsObject)) {
-      params.set(key, value);
-    }
+    const body = new URLSearchParams(paramsObject)
 
-    return this._Http.post<ITokenResponse>(`${this.apiUrl}/api/token`, {
-    }, {  params: querystring.stringify(params), headers: headers});
+    return this._Http.post<ITokenResponse>(`${this.apiUrl}/api/token`,
+      body
+    , {  params: params, headers: headers});
   }
 }
