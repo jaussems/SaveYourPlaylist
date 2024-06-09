@@ -1,0 +1,9 @@
+<h1>welcome to the callback page</h1>
+
+@if(code) {
+  <button (click)="authenticate()" >AUTH</button>
+}
+@else {
+  <p></p>
+  <a [routerLink]="['/home']">Go to home</a>
+}
